@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+  <title>Express Yourself!!</title>
+
+  <link rel="stylesheet" type="text/css">
+
+  <script type="text/javascript"></script>
+</head>
+
+<body>
+  <script src="js/three.js"></script>
+  <script src="js/GLTFLoader.js"></script>
+  <script>
+    var color = new THREE.Color(0x0b0c10);
+    var scene = new THREE.Scene();
+    var loader = new THREE.GLTFLoader();
+
+    loader.load('models/scene.gltf', function ( gltf ) {
+
+    	scene.add( gltf.scene );
+
+      gltf.animations; // Array<THREE.AnimationClip>
+      gltf.scene; // THREE.Scene
+      gltf.scenes; // Array<THREE.Scene>
+      gltf.cameras; // Array<THREE.Camera>
+      gltf.asset; // Object
+
+    }, undefined, function ( error ) {
+
+    	console.error( error );
+
+    } );
+    // scene.background = color;
+    //var camera = new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, 0.1, 1000 );
+    //
+    var renderer = new THREE.WebGLRenderer();
+    renderer.setSize( window.innerWidth, window.innerHeight );
+    document.body.appendChild( renderer.domElement );
+
+    // var geometry = new THREE.BoxGeometry( 1, 1, 1 );
+    // var material = new THREE.MeshBasicMaterial( { color: 0x66fcf1 } );
+    //
+    // // generate 9 cubes and add them to an array //
+    // var cubes = [];
+    // var i;
+    // for (i = 0; i < 9; i++) {
+    //   var cube = new THREE.Mesh( geometry, material );
+    //   cubes.push(cube);
+    // }
+    //
+    // // generate edges for each cube //
+    // numCubes = cubes.length;
+    // for (i = 0; i < numCubes; i++){
+    //   var edge_geometry = new THREE.EdgesGeometry(cubes[i].geometry);
+    //   var edge_material = new THREE.LineBasicMaterial( { color: 0xffff00, linewidth: 2 } );
+    //   var edges = new THREE.LineSegments(edge_geometry, edge_material);
+    //   cubes[i].add(edges);
+    // }
+    //
+    // var group = new THREE.Group();
+    // cubes.forEach(function (object){
+    //   group.add(object);
+    // });
+    // scene.add(group)
+
+    // add each cube to the scene //
+    // for (i = 0; i < numCubes; i++){
+    //   scene.add(cubes[i]);
+    // }
+
+    // set each cubes initial position //
+    // cubes[0].position.set(1,0,0);
+    // cubes[1].position.set(0,0,0);
+    // cubes[2].position.set(-1,0,0);
+
+    camera.position.z = 5;
+
+    // main animation function //
+    var animate = function () {
+      requestAnimationFrame( animate );
+
+      for (i = 0; i < numCubes; i++){
+        cubes[i].rotation.x += 0.01;
+        cubes[i].rotation.y += 0.01;
+      }
+      renderer.render(gltf.scene, gltf.camera);
+    };
+    //animate();
+
+    </script>
+</body>
+
+
+
+</html>

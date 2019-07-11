@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+  <title>Express Yourself!!</title>
+
+  <link rel="stylesheet" type="text/css">
+
+  <script type="text/javascript"></script>
+</head>
+
+<body>
+
+  <canvas id="c"></canvas>
+  <script src="https://threejsfundamentals.org/threejs/resources/threejs/r105/three.min.js"></script>
+  <script src="https://threejsfundamentals.org/threejs/resources/threejs/r105/js/controls/OrbitControls.js"></script>
+  <script src="https://threejsfundamentals.org/threejs/resources/threejs/r105/js/loaders/GLTFLoader.js"></script>
+  <script src="https://threejsfundamentals.org/threejs/../3rdparty/dat.gui.min.js"></script>
+  <script src="js/three.js"></script>
+  <script src="js/GLTFLoader.js"></script>
+  <script src="js/OrbitControls.js"></script>
+  <script>
+  // ===================== MAIN THREE.JS SCRIPT================================ //
+
+  // Load 3D Scene
+ var scene = new THREE.Scene();
+
+  // Load Camera Perspektive
+ var camera = new THREE.PerspectiveCamera( 25, window.innerWidth / window.innerHeight, 1, 20000 );
+ camera.position.set( 1, 1, 20 );
+
+  // Load a Renderer
+ var renderer = new THREE.WebGLRenderer();
+ renderer.setPixelRatio( window.devicePixelRatio );
+ renderer.setSize(window.innerWidth, window.innerHeight);
+ document.body.appendChild(renderer.domElement);
+
+  // Load the Orbitcontroller
+ var controls = new THREE.OrbitControls( camera, renderer.domElement );
+
+  // Load Light
+ var ambientLight = new THREE.AmbientLight( 0xcccccc );
+ scene.add( ambientLight );
+
+ var directionalLight = new THREE.DirectionalLight( 0x0b9c19 );
+ directionalLight.position.set( 0, 1, 1 ).normalize();
+ scene.add( directionalLight );
+
+ var children;
+ var numChildren;
+ var edge_geometry;
+ var edge_material;
+ var edges;
+ var group = new THREE.Group();
+ var loaded = 0;
+ var total = 100;
+ var root;
+
+ function main(){
+    // glTf loader
+   var loader = new THREE.GLTFLoader();
+   loader.load( './models/scene.gltf',
+
+   // On load function
+   function ( gltf ) {
+    root = gltf.scene;
+   	root.scale.set( 2, 2, 2 );
+   	root.position.x = 0;				    // Position (x = right+ left-)
+    root.position.y = 0;				    // Position (y = up+, down-)
+   	root.position.z = 0;				    // Position (z = front +, back-)
+
+    children = root.children; // Array of all the cubes
+    numChildren = children.length;
+
+    console.log(children);
+    // add line edges to each cube and add them to a group (aka "the big cube")//
+    for (var i = 0; i < numChildren; i++){
+      edge_geometry = new THREE.EdgesGeometry(children[i].geometry);
+      edge_material = new THREE.LineBasicMaterial( {color: 0x0b0c10} );
+      edges = new THREE.LineSegments(edge_geometry, edge_material);
+      children[i].add(edges);
+    }
+    scene.add(root);
+    loaded = true;
+    console.log("loaded!");
+
+    //createGroup(children);
+    render();
+    animate();
+  },
+
+  // On progress function
+  function (request) {
+    loaded = request.loaded;
+    total = request.total;
+    console.log("!");
+  }
+);
+
+    // while (loaded < total){
+    //   setTimeout(function(){
+    //     console.log("done");
+    //   }, 10);
+    // }
+    //createGroup(children);
+    //render();
+    //animate();
+
+  function createGroup(cubes){
+    const numCubes = cubes.length;
+    console.log("cubes length: " + numCubes);
+    for (var i = 0; i < numCubes; i++){
+      group.add(cubes[i]);
+    }
+  }
+
+   function animate() {
+   	requestAnimationFrame(animate);
+    //group.rotation.x += 0.01;
+    //group.rotation.y += 0.01;
+    //numChildren = children.length;
+
+    for (var i = 0; i < numChildren; i++){
+      children[i].rotation.x += 0.01;
+      children[i].rotation.y += 0.01;
+      children[i].rotation.z += 0.01;
+    }
+    render();
+   }
+
+   function render() {
+   	renderer.render(scene,camera);
+   }
+
+}
+
+ main();
+
+  // ===================== END THREE.JS SCRIPT ================================ //
+  </script>
+</body>
+
+
+
+</html>

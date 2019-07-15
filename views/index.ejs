@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
 
-  <title>Express Yourself!!</title>
+  <title>Self-Transforming Cube</title>
 
   <link rel="stylesheet" type="text/css">
 
@@ -63,7 +63,7 @@
  function main(){
     // glTf loader
    var loader = new THREE.GLTFLoader();
-   loader.load( './models/scene.gltf',
+   const res = loader.load('./models/scene.gltf',
 
    // On load function
    function ( gltf ) {
@@ -84,31 +84,13 @@
       edges = new THREE.LineSegments(edge_geometry, edge_material);
       children[i].add(edges);
     }
+
     scene.add(root);
-    loaded = true;
-    console.log("loaded!");
+  } => { console.log("done!") });
 
-    //createGroup(children);
-    render();
-    animate();
-  },
-
-  // On progress function
-  function (request) {
-    loaded = request.loaded;
-    total = request.total;
-    console.log("!");
-  }
-);
-
-    // while (loaded < total){
-    //   setTimeout(function(){
-    //     console.log("done");
-    //   }, 10);
-    // }
-    //createGroup(children);
-    //render();
-    //animate();
+  createGroup(children);
+  render();
+  animate();
 
   function createGroup(cubes){
     const numCubes = cubes.length;
@@ -120,9 +102,6 @@
 
    function animate() {
    	requestAnimationFrame(animate);
-    //group.rotation.x += 0.01;
-    //group.rotation.y += 0.01;
-    //numChildren = children.length;
 
     for (var i = 0; i < numChildren; i++){
       children[i].rotation.x += 0.01;
@@ -137,8 +116,6 @@
    }
 
 }
-
- main();
 
   // ===================== END THREE.JS SCRIPT ================================ //
   </script>

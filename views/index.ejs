@@ -23,11 +23,15 @@
   <script src="js/three.js"></script>
   <script src="js/GLTFLoader.js"></script>
   <script src="js/OrbitControls.js"></script>
+  <script src="node_modules/underscore/underscore.js"></script>
   <script>
   // ===================== MAIN THREE.JS SCRIPT================================ //
 
   // Load 3D Scene
  var scene = new THREE.Scene();
+
+  // Create the large cube group
+  var group = new THREE.Group();
 
   // Load Camera Perspektive
  var camera = new THREE.PerspectiveCamera( 25, window.innerWidth / window.innerHeight, 1, 20000 );
@@ -58,6 +62,10 @@
  var loaded = 0;
  var total = 100;
  var root;
+ var completed = false;
+ var group;
+ var pivot;
+ var side1;
 
  function main(){
     // glTf loader
@@ -73,45 +81,40 @@
      numChildren = children.length;
 
      console.log(children);
-     var group = new THREE.Group();
-
-
+     side1 = new THREE.Object3D();
      // add line edges to each cube and add them to a group (aka "the big cube")//
      for (var i = 0; i < numChildren; i++){
-       edge_geometry = new THREE.EdgesGeometry(children[i].geometry);
+       var cube = _.clone(children[i]);
+       edge_geometry = new THREE.EdgesGeometry(cube.geometry);
        edge_material = new THREE.LineBasicMaterial( {color: 0x0b0c10} );
        edges = new THREE.LineSegments(edge_geometry, edge_material);
-       children[i].add(edges);
-       group.add(children[i]);
+       cube.add(edges);
+       side1.add(cube);
+       //group.add(cube);
      }
 
      scene.add(root);
 
+
+     var pivot = new THREE.Group();
+     scene.add(pivot);
+     pivot.add(side1);
+     side1.position.set(0, 0, 0);
+
      render();
      animate();
-
    });
-
-  //createGroup(children);
-
-
-  function createGroup(cubes){
-    group = new THREE.Group();
-    const numCubes = cubes.length;
-    console.log("cubes length: " + numCubes);
-    for (var i = 0; i < numCubes; i++){
-      group.add(cubes[i]);
-    }
-  }
 
    function animate() {
    	requestAnimationFrame(animate);
 
-    for (var i = 0; i < numChildren; i++){
-      children[i].rotation.x += 0.01;
-      children[i].rotation.y += 0.01;
-      children[i].rotation.z += 0.01;
-    }
+    pivot.rotation.x += 0.01;
+    pivot.rotation.y += 0.01;
+    // for (var i = 0; i < numChildren; i++){
+    //   children[i].rotation.x += 0.01;
+    //   children[i].rotation.y += 0.01;
+    //   children[i].rotation.z += 0.01;
+    // }
     render();
    }
 
@@ -119,27 +122,6 @@
    	renderer.render(scene,camera);
    }
 
-   function onLoad(gltf) {
-      root = gltf.scene;
-      root.scale.set( 2, 2, 2 );
-      root.position.x = 0;				    // Position (x = right+ left-)
-      root.position.y = 0;				    // Position (y = up+, down-)
-      root.position.z = 0;				    // Position (z = front +, back-)
-
-      children = root.children; // Array of all the cubes
-      numChildren = children.length;
-
-      console.log(children);
-      // add line edges to each cube and add them to a group (aka "the big cube")//
-      for (var i = 0; i < numChildren; i++){
-        edge_geometry = new THREE.EdgesGeometry(children[i].geometry);
-        edge_material = new THREE.LineBasicMaterial( {color: 0x0b0c10} );
-        edges = new THREE.LineSegments(edge_geometry, edge_material);
-        children[i].add(edges);
-      }
-
-      scene.add(root);
-    }
 
 }
 

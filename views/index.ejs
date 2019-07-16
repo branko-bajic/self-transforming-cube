@@ -55,7 +55,6 @@
  var edge_geometry;
  var edge_material;
  var edges;
- var group = new THREE.Group();
  var loaded = 0;
  var total = 100;
  var root;
@@ -63,36 +62,41 @@
  function main(){
     // glTf loader
    var loader = new THREE.GLTFLoader();
-   const res = loader.load('./models/scene.gltf',
+   const res = loader.load('./models/scene.gltf', (gltf) => {
+     root = gltf.scene;
+     root.scale.set( 2, 2, 2 );
+     root.position.x = 0;				    // Position (x = right+ left-)
+     root.position.y = 0;				    // Position (y = up+, down-)
+     root.position.z = 0;				    // Position (z = front +, back-)
 
-   // On load function
-   function ( gltf ) {
-    root = gltf.scene;
-   	root.scale.set( 2, 2, 2 );
-   	root.position.x = 0;				    // Position (x = right+ left-)
-    root.position.y = 0;				    // Position (y = up+, down-)
-   	root.position.z = 0;				    // Position (z = front +, back-)
+     children = root.children; // Array of all the cubes
+     numChildren = children.length;
 
-    children = root.children; // Array of all the cubes
-    numChildren = children.length;
+     console.log(children);
+     var group = new THREE.Group();
 
-    console.log(children);
-    // add line edges to each cube and add them to a group (aka "the big cube")//
-    for (var i = 0; i < numChildren; i++){
-      edge_geometry = new THREE.EdgesGeometry(children[i].geometry);
-      edge_material = new THREE.LineBasicMaterial( {color: 0x0b0c10} );
-      edges = new THREE.LineSegments(edge_geometry, edge_material);
-      children[i].add(edges);
-    }
 
-    scene.add(root);
-  } => { console.log("done!") });
+     // add line edges to each cube and add them to a group (aka "the big cube")//
+     for (var i = 0; i < numChildren; i++){
+       edge_geometry = new THREE.EdgesGeometry(children[i].geometry);
+       edge_material = new THREE.LineBasicMaterial( {color: 0x0b0c10} );
+       edges = new THREE.LineSegments(edge_geometry, edge_material);
+       children[i].add(edges);
+       group.add(children[i]);
+     }
 
-  createGroup(children);
-  render();
-  animate();
+     scene.add(root);
+
+     render();
+     animate();
+
+   });
+
+  //createGroup(children);
+
 
   function createGroup(cubes){
+    group = new THREE.Group();
     const numCubes = cubes.length;
     console.log("cubes length: " + numCubes);
     for (var i = 0; i < numCubes; i++){
@@ -115,7 +119,31 @@
    	renderer.render(scene,camera);
    }
 
+   function onLoad(gltf) {
+      root = gltf.scene;
+      root.scale.set( 2, 2, 2 );
+      root.position.x = 0;				    // Position (x = right+ left-)
+      root.position.y = 0;				    // Position (y = up+, down-)
+      root.position.z = 0;				    // Position (z = front +, back-)
+
+      children = root.children; // Array of all the cubes
+      numChildren = children.length;
+
+      console.log(children);
+      // add line edges to each cube and add them to a group (aka "the big cube")//
+      for (var i = 0; i < numChildren; i++){
+        edge_geometry = new THREE.EdgesGeometry(children[i].geometry);
+        edge_material = new THREE.LineBasicMaterial( {color: 0x0b0c10} );
+        edges = new THREE.LineSegments(edge_geometry, edge_material);
+        children[i].add(edges);
+      }
+
+      scene.add(root);
+    }
+
 }
+
+  main();
 
   // ===================== END THREE.JS SCRIPT ================================ //
   </script>

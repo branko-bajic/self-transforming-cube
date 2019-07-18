@@ -34,8 +34,8 @@
   var group = new THREE.Group();
 
   // Load Camera Perspektive
- var camera = new THREE.PerspectiveCamera( 25, window.innerWidth / window.innerHeight, 1, 20000 );
- camera.position.set( 1, 1, 20 );
+ var camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 1, 20000 );
+ camera.position.set(1, 10, 15); // x, y, z
 
   // Load a Renderer
  var renderer = new THREE.WebGLRenderer();
@@ -64,7 +64,7 @@
  var root;
  var completed = false;
  var group;
- var pivot;
+ var pivot = new THREE.Group();
  var side1;
 
  function main(){
@@ -85,21 +85,24 @@
      // add line edges to each cube and add them to a group (aka "the big cube")//
      for (var i = 0; i < numChildren; i++){
        var cube = _.clone(children[i]);
+       cube.modelViewMatrix = _.clone(children[i].modelViewMatrix);
+       cube.normalMatrix = _.clone(children[i].normalMatrix);
+       //console.log(cube);
        edge_geometry = new THREE.EdgesGeometry(cube.geometry);
        edge_material = new THREE.LineBasicMaterial( {color: 0x0b0c10} );
        edges = new THREE.LineSegments(edge_geometry, edge_material);
        cube.add(edges);
        side1.add(cube);
-       //group.add(cube);
      }
-
      scene.add(root);
 
 
-     var pivot = new THREE.Group();
-     scene.add(pivot);
      pivot.add(side1);
-     side1.position.set(0, 0, 0);
+     side1.position.set(0.5, 0.5, 0.5); // Center of the cubes
+     scene.add(pivot);
+     //console.log(pivot);
+     //console.log(scene);
+
 
      render();
      animate();
@@ -108,7 +111,7 @@
    function animate() {
    	requestAnimationFrame(animate);
 
-    pivot.rotation.x += 0.01;
+    //pivot.rotation.x += 0.01;
     pivot.rotation.y += 0.01;
     // for (var i = 0; i < numChildren; i++){
     //   children[i].rotation.x += 0.01;

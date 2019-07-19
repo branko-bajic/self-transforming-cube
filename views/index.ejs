@@ -118,9 +118,8 @@
 
    function animate(){
    	requestAnimationFrame(animate);
-    update();
+    update(); // Update the animations
     pivot.rotation.y += 0.01; // Constant rotation of the big cube
-
 
     render();
   }
@@ -136,14 +135,10 @@
     clips = animations;
 
     // Play all animations
-    clips.forEach( function ( clip ) {
-      console.log(clip);
-    	mixer.clipAction( clip ).play();
+    clips.forEach(function (clip) {
+    	mixer.clipAction(clip).loop = THREE.LoopOnce; // Ensure the animation only plays once
+      mixer.clipAction(clip).play(); // Play the animation
     } );
-
-    render();
-    //cube = bigCube.children[0];
-    //cube.position.x += 0.01;
   }
 
 }

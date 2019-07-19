@@ -72,7 +72,7 @@
  function main(){
     // glTf loader
    var loader = new THREE.GLTFLoader();
-   const res = loader.load('./models/scene.gltf', (gltf) => {
+   const res = loader.load('./models/mainmodel.gltf', (gltf) => {
      animations = gltf.animations;
      root = gltf.scene;
      root.scale.set( 2, 2, 2 );
@@ -106,17 +106,19 @@
 
      console.log(children);
 
-     render();
      testMovement();
+     render();
      animate();
+
    });
 
    function update() {
-     mixer.update(deltaSeconds);
+     mixer.update(0.01);
    }
 
    function animate(){
    	requestAnimationFrame(animate);
+    update();
     pivot.rotation.y += 0.01; // Constant rotation of the big cube
 
 
@@ -129,13 +131,17 @@
 
   // Function to randomly move a small cube around a bit //
   function testMovement(){
+    requestAnimationFrame(animate);
     mixer = new THREE.AnimationMixer(scene);
     clips = animations;
 
     // Play all animations
     clips.forEach( function ( clip ) {
+      console.log(clip);
     	mixer.clipAction( clip ).play();
     } );
+
+    render();
     //cube = bigCube.children[0];
     //cube.position.x += 0.01;
   }

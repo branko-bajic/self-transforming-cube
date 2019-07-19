@@ -65,12 +65,15 @@
  var completed = false;
  var group;
  var pivot = new THREE.Group();
- var side1;
+ var bigCube;
+ var mixer;
+ var clips;
 
  function main(){
     // glTf loader
    var loader = new THREE.GLTFLoader();
    const res = loader.load('./models/scene.gltf', (gltf) => {
+     animations = gltf.animations;
      root = gltf.scene;
      root.scale.set( 2, 2, 2 );
      root.position.x = 0;				    // Position (x = right+ left-)
@@ -80,56 +83,65 @@
      children = root.children; // Array of all the cubes
      numChildren = children.length;
 
-     console.log(children);
-     side1 = new THREE.Object3D();
-     // add line edges to each cube and add them to a group (aka "the big cube")//
+     bigCube = new THREE.Object3D();
+
+     // add line edges to each cube and add them to a group (aka "the big cube") //
      for (var i = 0; i < numChildren; i++){
+       // Create a new cube object by cloning the original //
        var cube = _.clone(children[i]);
        cube.modelViewMatrix = _.clone(children[i].modelViewMatrix);
        cube.normalMatrix = _.clone(children[i].normalMatrix);
-       //console.log(cube);
+
+       // Draw the edge lines //
        edge_geometry = new THREE.EdgesGeometry(cube.geometry);
        edge_material = new THREE.LineBasicMaterial( {color: 0x0b0c10} );
        edges = new THREE.LineSegments(edge_geometry, edge_material);
        cube.add(edges);
-       side1.add(cube);
+       bigCube.add(cube);
      }
      scene.add(root);
-
-
-     pivot.add(side1);
-     side1.position.set(0.5, 0.5, 0.5); // Center of the cubes
+     pivot.add(bigCube);
+     bigCube.position.set(0.5, 0.5, 0.5); // Pivot location (center of the cubes)
      scene.add(pivot);
-     //console.log(pivot);
-     //console.log(scene);
 
+     console.log(children);
 
      render();
+     testMovement();
      animate();
    });
 
-   function animate() {
+   function update() {
+     mixer.update(deltaSeconds);
+   }
+
+   function animate(){
    	requestAnimationFrame(animate);
+    pivot.rotation.y += 0.01; // Constant rotation of the big cube
 
-    //pivot.rotation.x += 0.01;
-    pivot.rotation.y += 0.01;
-    // for (var i = 0; i < numChildren; i++){
-    //   children[i].rotation.x += 0.01;
-    //   children[i].rotation.y += 0.01;
-    //   children[i].rotation.z += 0.01;
-    // }
+
     render();
-   }
+  }
 
-   function render() {
+   function render(){
    	renderer.render(scene,camera);
-   }
+  }
 
+  // Function to randomly move a small cube around a bit //
+  function testMovement(){
+    mixer = new THREE.AnimationMixer(scene);
+    clips = animations;
+
+    // Play all animations
+    clips.forEach( function ( clip ) {
+    	mixer.clipAction( clip ).play();
+    } );
+    //cube = bigCube.children[0];
+    //cube.position.x += 0.01;
+  }
 
 }
-
   main();
-
   // ===================== END THREE.JS SCRIPT ================================ //
   </script>
 </body>

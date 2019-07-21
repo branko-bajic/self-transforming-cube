@@ -26,14 +26,30 @@
   <script src="node_modules/underscore/underscore.js"></script>
   <script>
   // ===================== MAIN THREE.JS SCRIPT================================ //
+  var children;
+  var numChildren;
+  var edge_geometry;
+  var edge_material;
+  var edges;
+  var loaded = 0;
+  var total = 100;
+  var root;
+  var completed = false;
+  var group;
+  var pivot = new THREE.Group();
+  var bigCube;
+  var clips;
+  var aCounter = 0;
+  var numAnimations;
+  var animationsArr;
+  const ANIMATION_SPEEDCONTROL = 90;
 
   // Load 3D Scene
- var scene = new THREE.Scene();
+  var scene = new THREE.Scene();
 
-  // Create the large cube group
-  var group = new THREE.Group();
 
-  // Load Camera Perspektive
+
+  // Load Camera Perspective
  var camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 1, 20000 );
  camera.position.set(1, 10, 15); // x, y, z
 
@@ -54,20 +70,7 @@
  directionalLight.position.set( 0, 1, 1 ).normalize();
  scene.add( directionalLight );
 
- var children;
- var numChildren;
- var edge_geometry;
- var edge_material;
- var edges;
- var loaded = 0;
- var total = 100;
- var root;
- var completed = false;
- var group;
- var pivot = new THREE.Group();
- var bigCube;
- var mixer;
- var clips;
+ var mixer = new THREE.AnimationMixer(scene);
 
  function main(){
     // glTf loader
@@ -104,16 +107,20 @@
      bigCube.position.set(0.5, 0.5, 0.5); // Pivot location (center of the cubes)
      scene.add(pivot);
 
-     console.log(children);
+     // Create array for holding all the animations UUIDs//
+    animationsArr = [];
+    animations.forEach(function (clip) {
+      animationsArr.push(clip.uuid);
+    } );
+    numAnimations = animationsArr.length;
 
-     testMovement();
      render();
      animate();
 
    });
 
    function update() {
-     mixer.update(0.01);
+     mixer.update(0.1);
    }
 
    function animate(){
@@ -121,6 +128,13 @@
     update(); // Update the animations
     pivot.rotation.y += 0.01; // Constant rotation of the big cube
 
+    // Determine the cube to play the animation for every 100th frame
+    if (aCounter == 0 || aCounter % ANIMATION_SPEEDCONTROL == 0){
+      var randomClipID = Math.floor(Math.random() * (numAnimations + 1)); // Generate a random num between 0 and the
+      newAnimation(animationsArr[randomClipID]);                          // number of animations
+    }
+
+    aCounter += 1;
     render();
   }
 
@@ -128,19 +142,19 @@
    	renderer.render(scene,camera);
   }
 
-  // Function to randomly move a small cube around a bit //
-  function testMovement(){
-    requestAnimationFrame(animate);
-    mixer = new THREE.AnimationMixer(scene);
-    clips = animations;
+  // Function to play a small cubes animation //
+  function newAnimation(uuid){
+    //requestAnimationFrame(animate);
 
-    // Play all animations
-    clips.forEach(function (clip) {
-    	mixer.clipAction(clip).loop = THREE.LoopOnce; // Ensure the animation only plays once
-      mixer.clipAction(clip).play(); // Play the animation
-    } );
+    // Play the animation //
+    animations.forEach(function (clip) {
+      if (clip.uuid == uuid) {
+        mixer.clipAction(clip).loop = THREE.LoopOnce; // Ensure the animation only plays once
+        mixer.clipAction(clip).play(); // Play the animation
+        mixer.clipAction(clip).reset();
+      }
+    });
   }
-
 }
   main();
   // ===================== END THREE.JS SCRIPT ================================ //

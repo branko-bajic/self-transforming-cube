@@ -42,7 +42,8 @@
   var aCounter = 0;
   var numAnimations;
   var animationsArr;
-  const ANIMATION_SPEEDCONTROL = 90;
+  const ANIMATION_SPEEDCONTROL = 10;
+  var currPlaying = [];
 
   // Load 3D Scene
   var scene = new THREE.Scene();
@@ -75,7 +76,7 @@
  function main(){
     // glTf loader
    var loader = new THREE.GLTFLoader();
-   const res = loader.load('./models/mainmodel.gltf', (gltf) => {
+   const res = loader.load('./models/cubes.gltf', (gltf) => {
      animations = gltf.animations;
      root = gltf.scene;
      root.scale.set( 2, 2, 2 );
@@ -113,6 +114,8 @@
       animationsArr.push(clip.uuid);
     } );
     numAnimations = animationsArr.length;
+    console.log(animationsArr);
+    console.log(animations);
 
      render();
      animate();
@@ -120,7 +123,7 @@
    });
 
    function update() {
-     mixer.update(0.1);
+     mixer.update(0.01);
    }
 
    function animate(){
@@ -128,10 +131,10 @@
     update(); // Update the animations
     pivot.rotation.y += 0.01; // Constant rotation of the big cube
 
-    // Determine the cube to play the animation for every 100th frame
+    // Determine the cube to play the animation for //
     if (aCounter == 0 || aCounter % ANIMATION_SPEEDCONTROL == 0){
-      var randomClipID = Math.floor(Math.random() * (numAnimations + 1)); // Generate a random num between 0 and the
-      newAnimation(animationsArr[randomClipID]);                          // number of animations
+      var randomClipID = Math.floor(Math.random() * (numAnimations)); // Generate a random num between 0 and the
+      newAnimation(animationsArr[randomClipID]);                      // number of animations
     }
 
     aCounter += 1;
@@ -142,16 +145,26 @@
    	renderer.render(scene,camera);
   }
 
+  function arrayRemove(arr, value) {
+
+   return arr.filter(function(ele){
+       return ele != value;
+   });
+
+}
+
   // Function to play a small cubes animation //
   function newAnimation(uuid){
     //requestAnimationFrame(animate);
 
     // Play the animation //
     animations.forEach(function (clip) {
-      if (clip.uuid == uuid) {
+      if (clip.uuid == uuid && !mixer.clipAction(clip).isRunning()) {
+        //currPlaying.push(uuid);
         mixer.clipAction(clip).loop = THREE.LoopOnce; // Ensure the animation only plays once
         mixer.clipAction(clip).play(); // Play the animation
         mixer.clipAction(clip).reset();
+        //currPlaying = arrayRemove(currPlaying, uuid); // Remove the animation from the list of currently playing animations
       }
     });
   }
